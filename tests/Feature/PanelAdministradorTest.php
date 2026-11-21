@@ -1,0 +1,129 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Paradero;
+use App\Models\User;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Tests\TestCase;
+
+class PanelAdministradorTest extends TestCase
+{
+    use LazilyRefreshDatabase;
+
+    public function test_admin_puede_abrir_el_panel_y_ver_los_paraderos(): void
+    {
+        $paradero = Paradero::factory()->create([
+            'nombre' => 'Puerta Principal',
+            'latitud' => -12.0582,
+            'longitud' => -77.084,
+        ]);
+        $administrador = User::factory()->administrador()->create();
+
+        $this->actingAs($administrador)
+            ->get(route('admin.index'))
+            ->assertOk()
+            ->assertSee('Agregar paraderos')
+            ->assertSee('Usar mi ubicación actual')
+            ->assertSee('Puerta Principal')
+            ->assertSee('-12.0582000')
+            ->assertSee('-77.0840000');
+    }
+
+    public function test_visitante_es_redirigido_al_login(): void
+    {
+        $this->get(route('admin.index'))
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_pasajero_no_puede_abrir_el_panel_de_administracion(): void
+    {
+        $this->actingAs(User::factory()->create())
+            ->get(route('admin.index'))
+            ->assertForbidden();
+    }
+
+    public function test_conductor_no_puede_agregar_paraderos(): void
+    {
+        $conductor = User::factory()->conductor()->create();
+
+        $this->actingAs($conductor)
+            ->post(route('admin.paraderos.store'), [
+                'nombre' => 'Paradero no autorizado',
+                'latitud' => -12.0582,
+                'longitud' => -77.084,
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('paraderos', ['nombre' => 'Paradero no autorizado']);
+    }
+
+    public function test_crear_paradero_requiere_nombre_y_coordenadas(): void
+    {
+        $administrador = User::factory()->administrador()->create();
+
+        $this->actingAs($administrador)
+            ->post(route('admin.paraderos.store'), [])
+            ->assertSessionHasErrors([
+                'nombre' => 'Escribe el nombre del paradero.',
+                'latitud' => 'Indica la latitud del paradero.',
+                'longitud' => 'Indica la longitud del paradero.',
+            ]);
+    }
+
+    public function test_las_coordenadas_deben_estar_en_un_rango_valido(): void
+    {
+        $administrador = User::factory()->administrador()->create();
+
+        $this->actingAs($administrador)
+            ->post(route('admin.paraderos.store'), [
+                'nombre' => 'Paradero fuera de rango',
+                'latitud' => 91,
+                'longitud' => -181,
+            ])
+            ->assertSessionHasErrors([
+                'latitud' => 'La latitud debe estar entre -90 y 90.',
+                'longitud' => 'La longitud debe estar entre -180 y 180.',
+            ]);
+    }
+
+    public function test_no_se_puede_repetir_el_nombre_de_un_paradero(): void
+    {
+        Paradero::factory()->create(['nombre' => 'Biblioteca Central']);
+        $administrador = User::factory()->administrador()->create();
+
+        $this->actingAs($administrador)
+            ->post(route('admin.paraderos.store'), [
+                'nombre' => 'Biblioteca Central',
+                'latitud' => -12.0585,
+                'longitud' => -77.0826,
+            ])
+            ->assertSessionHasErrors([
+                'nombre' => 'Ya existe un paradero con ese nombre.',
+            ]);
+    }
+
+    public function test_admin_crea_un_paradero_y_calcula_su_orden(): void
+    {
+        Paradero::factory()->create(['orden' => 5]);
+        $administrador = User::factory()->administrador()->create();
+
+        $this->actingAs($administrador)
+            ->post(route('admin.paraderos.store'), [
+                'nombre' => 'Nuevo Paradero',
+                'descripcion' => 'Ingreso norte',
+                'latitud' => -12.0582,
+                'longitud' => -77.084,
+            ])
+            ->assertRedirect(route('admin.index'))
+            ->assertSessionHas('estado', 'Paradero agregado correctamente.');
+
+        $paradero = Paradero::query()->where('nombre', 'Nuevo Paradero')->firstOrFail();
+
+        $this->assertSame('Ingreso norte', $paradero->descripcion);
+        $this->assertSame(6, $paradero->orden);
+        $this->assertTrue($paradero->activo);
+        $this->assertEqualsWithDelta(-12.0582, (float) $paradero->latitud, 0.0000001);
+        $this->assertEqualsWithDelta(-77.084, (float) $paradero->longitud, 0.0000001);
+    }
+}
