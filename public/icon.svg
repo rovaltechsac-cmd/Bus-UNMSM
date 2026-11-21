@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Bus San Marcos">
+  <rect width="512" height="512" rx="96" fill="#8c1d40"/>
+  <path d="M96 176a48 48 0 0 1 48-48h224a48 48 0 0 1 48 48v136a32 32 0 0 1-32 32H128a32 32 0 0 1-32-32V176Z" fill="#fff"/>
+  <rect x="120" y="164" width="272" height="96" rx="20" fill="#f8d7e0"/>
+  <circle cx="160" cy="344" r="28" fill="#1f2937"/>
+  <circle cx="352" cy="344" r="28" fill="#1f2937"/>
+  <text x="256" y="312" font-family="Arial, sans-serif" font-size="72" font-weight="700" text-anchor="middle" fill="#8c1d40">U</text>
+</svg>
