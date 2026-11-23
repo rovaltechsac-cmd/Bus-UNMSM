@@ -43,9 +43,6 @@
                         </ul>
                     </div>
                 @endif
-            </div>
-        </div>
-    </div>
 @else
     <section aria-labelledby="titulo-formulario" class="mb-4 rounded-2xl border border-line bg-surface p-4 shadow-sm sm:p-5">
         <h2 id="titulo-formulario" class="text-lg font-extrabold text-ink">

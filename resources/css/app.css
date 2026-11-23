@@ -58,6 +58,11 @@ body {
     isolation: isolate;
 }
 
+/* El modal debe quedar por encima de Leaflet (sus panes internos llegan a z-index 800). */
+#modal-agregar-paradero {
+    z-index: 1000;
+}
+
 .pin-paradero {
     filter: drop-shadow(0 3px 2px rgb(0 0 0 / 55%));
 }
