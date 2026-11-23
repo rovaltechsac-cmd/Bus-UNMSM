@@ -59,6 +59,18 @@ Route::middleware('auth')->group(function (): void {
         ->middleware('role:admin')
         ->name('admin.paraderos.store');
 
+    Route::get('/admin/paraderos/{paradero}/edit', [AdminController::class, 'editParadero'])
+        ->middleware('role:admin')
+        ->name('admin.paraderos.edit');
+
+    Route::put('/admin/paraderos/{paradero}', [AdminController::class, 'updateParadero'])
+        ->middleware('role:admin')
+        ->name('admin.paraderos.update');
+
+    Route::delete('/admin/paraderos/{paradero}', [AdminController::class, 'destroyParadero'])
+        ->middleware('role:admin')
+        ->name('admin.paraderos.destroy');
+
     Route::get('/pasajero', [PasajeroController::class, 'index'])
         ->middleware('role:pasajero,admin')
         ->name('pasajero.index');

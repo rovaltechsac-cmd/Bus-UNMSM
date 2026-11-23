@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Paradero;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -12,24 +13,80 @@ class AdminController extends Controller
 {
     public function index(): View
     {
-        $paraderos = Paradero::query()
-            ->orderBy('orden')
-            ->orderBy('nombre')
-            ->get(['id', 'nombre', 'descripcion', 'latitud', 'longitud', 'orden', 'activo']);
-
         return view('admin.index', [
             'pagina' => 'admin',
-            'paraderos' => $paraderos,
+            'paraderos' => $this->paraderosOrdenados(),
+        ]);
+    }
+
+    public function editParadero(Paradero $paradero): View
+    {
+        return view('admin.editar', [
+            'pagina' => 'admin',
+            'paradero' => $paradero,
+            'paraderos' => $this->paraderosOrdenados(),
         ]);
     }
 
     public function storeParadero(Request $request): RedirectResponse
     {
-        $datos = $request->validate([
-            'nombre' => ['required', 'string', 'max:120', Rule::unique('paraderos', 'nombre')],
+        $datos = $this->validarParadero($request);
+
+        $datos['orden'] = (int) (Paradero::query()->max('orden') ?? 0) + 1;
+        $datos['activo'] = true;
+
+        Paradero::query()->create($datos);
+
+        return to_route('admin.index')
+            ->with('estado', 'Paradero agregado correctamente.');
+    }
+
+    public function updateParadero(Request $request, Paradero $paradero): RedirectResponse
+    {
+        $datos = $this->validarParadero($request, $paradero);
+
+        $datos['activo'] = $request->boolean('activo');
+
+        $paradero->update($datos);
+
+        return to_route('admin.index')
+            ->with('estado', 'Paradero actualizado correctamente.');
+    }
+
+    public function destroyParadero(Paradero $paradero): RedirectResponse
+    {
+        $paradero->delete();
+
+        return to_route('admin.index')
+            ->with('estado', 'Paradero eliminado correctamente.');
+    }
+
+    /** @return Collection<int, Paradero> */
+    private function paraderosOrdenados(): Collection
+    {
+        return Paradero::query()
+            ->orderBy('orden')
+            ->orderBy('nombre')
+            ->get(['id', 'nombre', 'descripcion', 'latitud', 'longitud', 'orden', 'activo']);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function validarParadero(Request $request, ?Paradero $paradero = null): array
+    {
+        $reglaNombre = Rule::unique('paraderos', 'nombre');
+
+        if ($paradero !== null) {
+            $reglaNombre->ignore($paradero);
+        }
+
+        return $request->validate([
+            'nombre' => ['required', 'string', 'max:120', $reglaNombre],
             'descripcion' => ['nullable', 'string', 'max:255'],
             'latitud' => ['required', 'numeric', 'between:-90,90'],
             'longitud' => ['required', 'numeric', 'between:-180,180'],
+            'activo' => ['nullable', 'boolean'],
         ], [
             'nombre.required' => 'Escribe el nombre del paradero.',
             'nombre.unique' => 'Ya existe un paradero con ese nombre.',
@@ -40,13 +97,5 @@ class AdminController extends Controller
             'longitud.numeric' => 'La longitud debe ser un número.',
             'longitud.between' => 'La longitud debe estar entre -180 y 180.',
         ]);
-
-        $datos['orden'] = (int) (Paradero::query()->max('orden') ?? 0) + 1;
-        $datos['activo'] = true;
-
-        Paradero::query()->create($datos);
-
-        return to_route('admin.index')
-            ->with('estado', 'Paradero agregado correctamente.');
     }
 }

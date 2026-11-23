@@ -20,7 +20,7 @@
     @php
         $seccionLayout = match ($pagina ?? 'general') {
             'dashboard' => 'Resumen',
-            'admin' => 'Administración',
+            'admin' => 'Configuración',
             'conductor' => 'Conductor',
             'pasajero' => 'Pasajero',
             default => 'Panel',
@@ -98,9 +98,12 @@
             }
 
             const alternarMenu = (abierto) => {
-                sidebar.style.transform = abierto ? 'translateX(0)' : '';
+                sidebar.classList.toggle('-translate-x-full', !abierto);
+                sidebar.classList.toggle('translate-x-0', abierto);
                 overlay.classList.toggle('hidden', !abierto);
+                overlay.setAttribute('aria-hidden', abierto ? 'false' : 'true');
                 boton.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+                boton.setAttribute('aria-label', abierto ? 'Cerrar menú' : 'Abrir menú');
                 document.body.classList.toggle('overflow-hidden', abierto);
             };
 
@@ -110,8 +113,18 @@
 
             overlay.addEventListener('click', () => alternarMenu(false));
 
+            sidebar.querySelectorAll('a, button').forEach((enlace) => {
+                enlace.addEventListener('click', () => alternarMenu(false));
+            });
+
             document.addEventListener('keydown', (evento) => {
                 if (evento.key === 'Escape') {
+                    alternarMenu(false);
+                }
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 1024) {
                     alternarMenu(false);
                 }
             });

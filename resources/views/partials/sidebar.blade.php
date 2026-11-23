@@ -21,8 +21,8 @@
         <x-nav-link ruta="{{ route('dashboard.index') }}" etiqueta="Resumen" icono="resumen" :activo="($pagina ?? '') === 'dashboard'" />
 
         @if (auth()->user()?->esAdministrador())
-            <x-nav-link ruta="{{ route('admin.index') }}" etiqueta="Administración" icono="paraderos" :activo="($pagina ?? '') === 'admin'" />
-            <x-nav-link ruta="{{ route('admin.index') }}" etiqueta="Paraderos" icono="paraderos" />
+            <x-nav-link ruta="{{ route('admin.index') }}" etiqueta="Configuración" icono="paraderos" :activo="request()->routeIs('admin.*')" />
+            <x-nav-link ruta="{{ route('admin.index') }}#listado" etiqueta="Paraderos" icono="bus" />
             <x-nav-link ruta="{{ route('pasajero.index') }}" etiqueta="Vista del pasajero" icono="bus" />
         @endif
 

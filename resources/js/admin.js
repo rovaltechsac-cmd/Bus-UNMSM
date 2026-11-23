@@ -34,7 +34,10 @@ function sincronizarInputs() {
 function inicializarMapa() {
     controlMapa = crearMapaAdmin(configuracion.paraderos ?? [], {
         alElegir: mostrarUbicacion,
+        tituloMarcador: configuracion.marcadorTitulo,
     });
+
+    sincronizarInputs();
 }
 
 window.__mapaIniciar = inicializarMapa;

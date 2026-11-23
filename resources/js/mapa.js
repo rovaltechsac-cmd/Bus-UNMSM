@@ -50,7 +50,7 @@ function crearMapaBase(paraderos, { alSeleccionarParadero } = {}) {
     return mapa;
 }
 
-export function crearMapaAdmin(paraderos, { alElegir } = {}) {
+export function crearMapaAdmin(paraderos, { alElegir, tituloMarcador } = {}) {
     const L = window.L;
     const mapa = crearMapaBase(paraderos);
 
@@ -72,7 +72,7 @@ export function crearMapaAdmin(paraderos, { alElegir } = {}) {
 
         if (!marcadorNuevo) {
             marcadorNuevo = L.marker(posicion, {
-                title: 'Ubicación del nuevo paradero',
+                title: tituloMarcador ?? 'Ubicación del nuevo paradero',
                 draggable: true,
             }).addTo(mapa);
             configurarMarcadorNuevo();
