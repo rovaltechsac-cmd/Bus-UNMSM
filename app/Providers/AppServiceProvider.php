@@ -30,6 +30,14 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::preventLazyLoading(! app()->isProduction());
 
+        if (config('database.connections.sqlite.database') === 'database/app.sqlite') {
+            $baseDatosEditable = database_path('app.sqlite');
+
+            if (! is_file($baseDatosEditable)) {
+                copy(database_path('base.sqlite'), $baseDatosEditable);
+            }
+        }
+
         Gate::policy(AlertaAsistencia::class, AlertaAsistenciaPolicy::class);
 
         Gate::define('ver-panel-invidente', fn (User $usuario): bool => $usuario->esInvidente());
