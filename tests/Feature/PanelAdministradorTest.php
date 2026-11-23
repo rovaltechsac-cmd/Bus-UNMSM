@@ -39,8 +39,11 @@ class PanelAdministradorTest extends TestCase
             ->assertOk()
             ->assertSee('id="modal-agregar-paradero"', false)
             ->assertSee('id="btn-agregar-paradero"', false)
+            ->assertSee('id="tab-mapa"', false)
+            ->assertSee('id="tab-paraderos"', false)
             ->assertSee('Agregar paradero')
-            ->assertSee('Usar mi ubicación actual');
+            ->assertSee('Usar mi ubicación actual')
+            ->assertDontSee('El marcador es el punto que se guardará.');
     }
 
     public function test_visitante_es_redirigido_al_login(): void

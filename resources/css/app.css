@@ -63,6 +63,89 @@ body {
     z-index: 1000;
 }
 
+/* Solamente la vista de configuración: pestañas, modal animado y hovers. */
+.configuracion-paraderos .config-tab {
+    transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease;
+}
+
+.configuracion-paraderos .config-tab:hover {
+    color: var(--text-primary);
+    background: var(--bg-surface-alt);
+}
+
+.configuracion-paraderos .config-tab[aria-selected="true"] {
+    color: var(--text-primary);
+    border-color: var(--accent-unmsm);
+}
+
+.configuracion-paraderos .config-tab-panel {
+    animation: configuracion-aparecer 180ms ease both;
+}
+
+@keyframes configuracion-aparecer {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.configuracion-paraderos #btn-agregar-paradero {
+    transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.configuracion-paraderos #btn-agregar-paradero:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgb(185 28 28 / 35%);
+}
+
+.configuracion-paraderos tbody tr {
+    transition: background-color 150ms ease;
+}
+
+.configuracion-paraderos tbody tr:hover {
+    background: rgb(28 32 39 / 75%);
+}
+
+.configuracion-paraderos .tabla-acciones a,
+.configuracion-paraderos .tabla-acciones button {
+    transition: transform 150ms ease, background-color 150ms ease, border-color 150ms ease;
+}
+
+.configuracion-paraderos .tabla-acciones a:hover,
+.configuracion-paraderos .tabla-acciones button:hover {
+    transform: translateY(-1px);
+    background: var(--bg-surface-alt);
+}
+
+.configuracion-paraderos .modal-backdrop {
+    opacity: 0;
+    transition: opacity 180ms ease;
+}
+
+.configuracion-paraderos .modal-card {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+    transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.configuracion-paraderos #modal-agregar-paradero.modal-abierto .modal-backdrop {
+    opacity: 1;
+}
+
+.configuracion-paraderos #modal-agregar-paradero.modal-abierto .modal-card {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .configuracion-paraderos .config-tab-panel {
+        animation: none;
+    }
+
+    .configuracion-paraderos .modal-backdrop,
+    .configuracion-paraderos .modal-card {
+        transition: none;
+    }
+}
+
 .pin-paradero {
     filter: drop-shadow(0 3px 2px rgb(0 0 0 / 55%));
 }

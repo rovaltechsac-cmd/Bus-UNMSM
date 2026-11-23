@@ -16,9 +16,9 @@
          aria-labelledby="titulo-formulario"
          aria-hidden="true"
          data-tiene-errores="{{ $errors->any() ? '1' : '0' }}">
-        <div class="absolute inset-0 bg-canvas/80 backdrop-blur-sm" data-cerrar-modal></div>
+        <div class="modal-backdrop absolute inset-0 bg-canvas/80 backdrop-blur-sm" data-cerrar-modal></div>
         <div class="relative z-10 flex h-full items-center justify-center p-4 sm:p-6">
-            <div class="max-h-[90dvh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-line bg-surface p-4 shadow-2xl sm:p-5">
+            <div class="modal-card max-h-[90dvh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-line bg-surface p-4 shadow-2xl sm:p-5">
                 <div class="mb-4 flex items-start justify-between gap-3">
                     <div>
                         <p class="text-xs font-extrabold uppercase tracking-wider text-brand">Administración</p>
@@ -131,6 +131,9 @@
     </section>
 @endif
 
+@if ($modal)
+    <div id="panel-mapa" role="tabpanel" aria-labelledby="tab-mapa" class="config-tab-panel">
+@endif
 <section aria-labelledby="titulo-mapa-admin" class="mb-4 overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
     <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3">
         <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -150,9 +153,11 @@
             </button>
         @endif
     </div>
-    <p class="px-4 pt-3 text-xs text-muted">El marcador es el punto que se guardará.</p>
     <div id="mapa" class="h-[280px] w-full bg-surface-alt sm:h-[420px]" role="img" aria-label="Mapa para elegir la ubicación del paradero"></div>
 </section>
+@if ($modal)
+    </div>
+@endif
 
 @push('scripts')
     <script>
