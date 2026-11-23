@@ -19,7 +19,7 @@ class AutenticacionTest extends TestCase
             'password' => '20240001',
         ]);
 
-        $respuesta->assertRedirect(route('pasajero.index'));
+        $respuesta->assertRedirect(route('dashboard.index'));
         $this->assertAuthenticatedAs($pasajero);
     }
 
@@ -32,7 +32,7 @@ class AutenticacionTest extends TestCase
             'password' => 'ADMIN001',
         ]);
 
-        $respuesta->assertRedirect(route('admin.index'));
+        $respuesta->assertRedirect(route('dashboard.index'));
         $this->assertAuthenticatedAs($administrador);
     }
 
@@ -45,7 +45,7 @@ class AutenticacionTest extends TestCase
             'password' => 'COND001',
         ]);
 
-        $respuesta->assertRedirect(route('conductor.index'));
+        $respuesta->assertRedirect(route('dashboard.index'));
         $this->assertAuthenticatedAs($conductor);
     }
 
@@ -90,7 +90,7 @@ class AutenticacionTest extends TestCase
                 'password' => 'nueva-clave-123',
                 'password_confirmation' => 'nueva-clave-123',
             ])
-            ->assertRedirect(route('pasajero.index'));
+            ->assertRedirect(route('dashboard.index'));
 
         $this->assertNotNull($pasajero->fresh()->clave_cambiada_at);
 
@@ -106,7 +106,7 @@ class AutenticacionTest extends TestCase
 
         $this->actingAs($pasajero)
             ->get(route('clave.edit'))
-            ->assertRedirect(route('pasajero.index'))
+            ->assertRedirect(route('dashboard.index'))
             ->assertSessionHas('estado');
     }
 

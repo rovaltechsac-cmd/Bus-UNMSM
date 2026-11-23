@@ -23,7 +23,7 @@ class PanelInvidenteTest extends TestCase
             'password' => '20240002',
         ]);
 
-        $respuesta->assertRedirect(route('pasajero.invidente.index'));
+        $respuesta->assertRedirect(route('dashboard.index'));
         $this->assertAuthenticatedAs($invidente);
     }
 

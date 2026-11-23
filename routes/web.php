@@ -6,28 +6,15 @@ use App\Http\Controllers\Api\ParaderoController;
 use App\Http\Controllers\Api\UbicacionBusController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConductorController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PasajeroController;
 use App\Http\Controllers\PasajeroInvidenteController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    if (auth()->check()) {
-        $usuario = auth()->user();
-
-        if ($usuario->esAdministrador()) {
-            return to_route('admin.index');
-        }
-
-        if ($usuario->esConductor()) {
-            return to_route('conductor.index');
-        }
-
-        return $usuario->esInvidente()
-            ? to_route('pasajero.invidente.index')
-            : to_route('pasajero.index');
-    }
-
-    return to_route('login');
+    return auth()->check()
+        ? to_route('dashboard.index')
+        : to_route('login');
 })->name('inicio');
 
 Route::get('/login', [AuthController::class, 'showLogin'])
@@ -61,6 +48,8 @@ Route::post('/logout', [AuthController::class, 'logout'])
 Route::middleware('auth')->group(function (): void {
     Route::get('/cambiar-clave', [AuthController::class, 'showCambiarClave'])->name('clave.edit');
     Route::put('/cambiar-clave', [AuthController::class, 'updateClave'])->name('clave.update');
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
     Route::get('/admin', [AdminController::class, 'index'])
         ->middleware('role:admin')

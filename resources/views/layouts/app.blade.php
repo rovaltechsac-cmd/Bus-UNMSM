@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#8c1d40">
+    <meta name="theme-color" content="#0B0C0E">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <title>@yield('titulo', 'Bus San Marcos')</title>
@@ -16,59 +16,106 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('head')
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-900 antialiased" data-pagina="{{ $pagina ?? 'general' }}">
-    <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:font-semibold focus:shadow-lg">
+<body class="min-h-screen bg-canvas text-ink antialiased" data-pagina="{{ $pagina ?? 'general' }}">
+    @php
+        $seccionLayout = match ($pagina ?? 'general') {
+            'dashboard' => 'Resumen',
+            'admin' => 'Administración',
+            'conductor' => 'Conductor',
+            'pasajero' => 'Pasajero',
+            default => 'Panel',
+        };
+
+        $rolLayout = match (true) {
+            auth()->user()?->esAdministrador() => 'Administrador',
+            auth()->user()?->esConductor() => 'Conductor',
+            auth()->user()?->esInvidente() => 'Pasajero invidente',
+            default => 'Pasajero',
+        };
+    @endphp
+
+    <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:border focus:border-line focus:bg-surface focus:px-4 focus:py-2 focus:font-semibold focus:text-ink focus:shadow-lg">
         Saltar al contenido principal
     </a>
 
-    <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
-        <div class="mx-auto flex max-w-3xl items-center justify-between gap-2 px-3 py-2.5 sm:px-6 sm:py-3">
-            <div class="flex min-w-0 items-center gap-2.5">
-                <img src="{{ asset('logo-unmsm.png') }}" alt="Universidad Nacional Mayor de San Marcos"
-                     class="size-10 shrink-0 rounded-xl bg-white object-contain p-0.5 shadow-sm ring-1 ring-slate-200 sm:size-12">
-                <div class="min-w-0">
-                    <p class="truncate text-sm font-bold sm:text-base">Burrito San Marcos</p>
-                    <p class="truncate text-[11px] text-slate-500 sm:text-xs">
-                        @if (auth()->user()?->esAdministrador())
-                            Administrador
-                        @elseif (auth()->user()?->esConductor())
-                            Conductor
-                        @elseif (auth()->user()?->esInvidente())
-                            Pasajero invidente
-                        @else
-                            Pasajero
-                        @endif
-                    </p>
+    <div id="sidebar-overlay" class="fixed inset-0 z-40 hidden bg-canvas/80 backdrop-blur-sm lg:hidden" aria-hidden="true"></div>
+
+    @include('partials.sidebar')
+
+    <div class="min-h-screen lg:pl-72">
+        <header class="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur">
+            <div class="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
+                <button id="btn-menu" type="button"
+                        class="grid size-10 shrink-0 place-items-center rounded-xl border border-line bg-surface-alt text-muted transition hover:border-metallic hover:text-ink focus:outline-none focus:ring-4 focus:ring-brand/20 lg:hidden"
+                        aria-controls="sidebar-principal" aria-expanded="false" aria-label="Abrir menú">
+                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                        <path d="M4 7h16M4 12h16M4 17h16"></path>
+                    </svg>
+                </button>
+
+                <div class="min-w-0 flex-1">
+                    <nav aria-label="Ruta de navegación" class="hidden items-center gap-2 text-xs text-muted sm:flex">
+                        <span class="font-semibold">Panel</span>
+                        <span aria-hidden="true">/</span>
+                        <span class="font-bold text-ink">{{ $seccionLayout }}</span>
+                    </nav>
+                    <p class="truncate text-sm font-extrabold text-ink sm:hidden">Burrito San Marcos</p>
+                </div>
+
+                <div class="flex shrink-0 items-center gap-3">
+                    <span class="hidden rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-bold text-brand md:inline">
+                        {{ $rolLayout }}
+                    </span>
+                    <span class="hidden text-sm font-semibold text-muted sm:inline">{{ auth()->user()?->name }}</span>
+                    <span class="grid size-9 place-items-center rounded-full border border-line bg-brand text-xs font-extrabold text-white sm:hidden">
+                        {{ strtoupper(mb_substr(auth()->user()?->name ?? '?', 0, 1)) }}
+                    </span>
                 </div>
             </div>
+        </header>
 
-            <div class="flex shrink-0 items-center gap-1.5">
-                @if (auth()->user()?->puedeCambiarClave())
-                    <a href="{{ route('clave.edit') }}"
-                       class="rounded-lg px-2 py-2 text-xs font-bold text-[#8c1d40] transition hover:bg-[#8c1d40]/10 focus:outline-none focus:ring-4 focus:ring-[#8c1d40]/20 sm:px-3">
-                        <span class="sm:hidden">Clave</span><span class="hidden sm:inline">Cambiar clave</span>
-                    </a>
-                @endif
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-[#8c1d40]/20">
-                        Salir
-                    </button>
-                </form>
-            </div>
-        </div>
-    </header>
+        <main id="contenido" class="mx-auto max-w-7xl px-4 py-5 pb-10 sm:px-6 sm:py-6 lg:px-8">
+            @if (session('estado'))
+                <div class="mb-5 rounded-xl border border-brand/40 bg-brand/10 p-3 text-sm font-semibold text-ink" role="status">
+                    {{ session('estado') }}
+                </div>
+            @endif
 
-    <main id="contenido" class="mx-auto max-w-3xl px-3 py-4 pb-10 sm:px-6 sm:py-6">
-        @if (session('estado'))
-            <div class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm font-semibold text-emerald-800" role="status">
-                {{ session('estado') }}
-            </div>
-        @endif
-
-        @yield('contenido')
-    </main>
+            @yield('contenido')
+        </main>
+    </div>
 
     @stack('scripts')
+
+    <script>
+        (() => {
+            const boton = document.getElementById('btn-menu');
+            const sidebar = document.getElementById('sidebar-principal');
+            const overlay = document.getElementById('sidebar-overlay');
+
+            if (!boton || !sidebar || !overlay) {
+                return;
+            }
+
+            const alternarMenu = (abierto) => {
+                sidebar.style.transform = abierto ? 'translateX(0)' : '';
+                overlay.classList.toggle('hidden', !abierto);
+                boton.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+                document.body.classList.toggle('overflow-hidden', abierto);
+            };
+
+            boton.addEventListener('click', () => {
+                alternarMenu(boton.getAttribute('aria-expanded') !== 'true');
+            });
+
+            overlay.addEventListener('click', () => alternarMenu(false));
+
+            document.addEventListener('keydown', (evento) => {
+                if (evento.key === 'Escape') {
+                    alternarMenu(false);
+                }
+            });
+        })();
+    </script>
 </body>
 </html>

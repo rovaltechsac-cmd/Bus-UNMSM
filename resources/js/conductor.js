@@ -69,7 +69,7 @@ async function peticion(url, opciones = {}) {
 
 function iniciarGeolocalizacion() {
     if (!navigator.geolocation) {
-        indicadorGps.className = 'size-3 shrink-0 rounded-full bg-red-500';
+        indicadorGps.className = 'size-3 shrink-0 rounded-full bg-brand-hover';
         estadoGps.textContent = 'Este navegador no soporta geolocalización';
         return;
     }
@@ -85,7 +85,7 @@ function iniciarGeolocalizacion() {
             const { latitude, longitude, heading, accuracy } = posicion.coords;
             const ahora = Date.now();
 
-            indicadorGps.className = 'size-3 shrink-0 rounded-full bg-emerald-500';
+            indicadorGps.className = 'size-3 shrink-0 rounded-full bg-brand';
             estadoGps.textContent = 'Ubicación obtenida';
             detalleGps.textContent = `Lat ${latitude.toFixed(6)} · Lon ${longitude.toFixed(6)} · ±${Math.round(accuracy)} m`;
 
@@ -116,7 +116,7 @@ function iniciarGeolocalizacion() {
             }
         },
         (error) => {
-            indicadorGps.className = 'size-3 shrink-0 rounded-full bg-red-500';
+            indicadorGps.className = 'size-3 shrink-0 rounded-full bg-brand-hover';
             estadoGps.textContent = 'No se pudo acceder al GPS';
             detalleGps.textContent = error.message;
         },
@@ -126,21 +126,21 @@ function iniciarGeolocalizacion() {
 
 function crearTarjeta(alerta) {
     const articulo = document.createElement('article');
-    articulo.className = `rounded-xl border-2 p-4 ${alerta.estado === 'pendiente' ? 'border-red-300 bg-red-50' : 'border-amber-300 bg-amber-50'}`;
+    articulo.className = `rounded-xl border p-4 ${alerta.estado === 'pendiente' ? 'border-brand/40 bg-brand/10' : 'border-line bg-surface-alt'}`;
 
     const titulo = document.createElement('h3');
-    titulo.className = 'text-base font-bold text-slate-900';
+    titulo.className = 'text-base font-bold text-ink';
     titulo.textContent = `Persona invidente en: ${alerta.paradero.nombre}`;
     articulo.append(titulo);
 
     const detalle = document.createElement('p');
-    detalle.className = 'mt-1 text-xs text-slate-600';
+    detalle.className = 'mt-1 text-xs text-muted';
     detalle.textContent = `${alerta.pasajero?.name ?? 'Pasajero'} · Estado: ${alerta.estado.replaceAll('_', ' ')}`;
     articulo.append(detalle);
 
     if (alerta.nota) {
         const nota = document.createElement('p');
-        nota.className = 'mt-1 text-sm text-slate-700';
+        nota.className = 'mt-1 text-sm text-ink';
         nota.textContent = alerta.nota;
         articulo.append(nota);
     }
@@ -149,7 +149,7 @@ function crearTarjeta(alerta) {
     boton.type = 'button';
     boton.dataset.id = String(alerta.id);
     boton.dataset.accion = alerta.estado === 'pendiente' ? 'atender' : 'finalizar';
-    boton.className = 'mt-3 w-full rounded-lg bg-[#8c1d40] px-3 py-2.5 text-sm font-bold text-white focus:outline-none focus:ring-4 focus:ring-[#8c1d40]/30';
+    boton.className = 'mt-3 w-full rounded-lg bg-brand px-3 py-2.5 text-sm font-bold text-white transition hover:bg-brand-hover focus:outline-none focus:ring-4 focus:ring-brand/30';
     boton.textContent = alerta.estado === 'pendiente' ? 'Ya estoy atendiendo' : 'Marcar como atendido';
     articulo.append(boton);
 

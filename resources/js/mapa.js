@@ -37,9 +37,9 @@ function crearMapaBase(paraderos, { alSeleccionarParadero } = {}) {
         const longitud = Number(paradero.longitud);
         const marcador = L.circleMarker([latitud, longitud], {
             radius: 9,
-            color: '#ffffff',
+            color: '#F3F4F6',
             weight: 2,
-            fillColor: '#8c1d40',
+            fillColor: '#B91C1C',
             fillOpacity: 1,
         }).addTo(mapa);
 
@@ -106,7 +106,7 @@ export function crearMapaCampus(paraderos, { alSeleccionarParadero } = {}) {
     const centro = centroDe(paraderos);
     const iconoBus = L.divIcon({
         className: 'bus-marker',
-        html: '<div style="display:grid;place-items:center;width:100%;height:100%;color:#0f766e;font-size:20px;line-height:1;text-shadow:0 0 2px #fff;">▲</div>',
+        html: '<div style="display:grid;place-items:center;width:100%;height:100%;color:#B91C1C;font-size:20px;line-height:1;text-shadow:0 0 2px #0B0C0E;">▲</div>',
         iconSize: [28, 28],
         iconAnchor: [14, 14],
     });

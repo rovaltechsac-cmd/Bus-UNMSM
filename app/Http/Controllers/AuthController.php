@@ -37,7 +37,7 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return $this->destinoTrasIngreso(Auth::user());
+        return $this->destinoTrasIngreso();
     }
 
     public function logout(Request $request): RedirectResponse
@@ -57,7 +57,7 @@ class AuthController extends Controller
         $usuario = $request->user();
 
         if (! $usuario->puedeCambiarClave()) {
-            return $this->destinoTrasIngreso($usuario)
+            return $this->destinoTrasIngreso()
                 ->with('estado', 'Tu contraseña ya fue cambiada. Si la olvidaste, usa «Olvidé mi contraseña» en el ingreso.');
         }
 
@@ -70,7 +70,7 @@ class AuthController extends Controller
         $usuario = $request->user();
 
         if (! $usuario->puedeCambiarClave()) {
-            return $this->destinoTrasIngreso($usuario)
+            return $this->destinoTrasIngreso()
                 ->with('estado', 'Tu contraseña ya fue cambiada. Si la olvidaste, usa «Olvidé mi contraseña» en el ingreso.');
         }
 
@@ -89,7 +89,7 @@ class AuthController extends Controller
             'clave_cambiada_at' => now(),
         ]);
 
-        return $this->destinoTrasIngreso($usuario)
+        return $this->destinoTrasIngreso()
             ->with('estado', 'Tu contraseña se actualizó correctamente.');
     }
 
@@ -167,20 +167,8 @@ class AuthController extends Controller
         return to_route('login')->with('estado', 'Tu contraseña fue actualizada. Ahora ingresa con tu código.');
     }
 
-    private function destinoTrasIngreso(User $usuario): RedirectResponse
+    private function destinoTrasIngreso(): RedirectResponse
     {
-        if ($usuario->esAdministrador()) {
-            return to_route('admin.index');
-        }
-
-        if ($usuario->esConductor()) {
-            return to_route('conductor.index');
-        }
-
-        if ($usuario->esInvidente()) {
-            return to_route('pasajero.invidente.index');
-        }
-
-        return to_route('pasajero.index');
+        return to_route('dashboard.index');
     }
 }

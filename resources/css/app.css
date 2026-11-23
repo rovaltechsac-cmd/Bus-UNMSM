@@ -1,9 +1,91 @@
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../resources/views/**/*.blade.php';
+@source '../../resources/js/**/*.js';
 @source '../../storage/framework/views/*.php';
+
+:root {
+    color-scheme: dark;
+
+    --bg-primary: #0B0C0E;
+    --bg-surface: #14171C;
+    --bg-surface-alt: #1C2027;
+    --border-subtle: #262B34;
+    --accent-unmsm: #B91C1C;
+    --accent-unmsm-hover: #8E1313;
+    --accent-metallic: #9CA3AF;
+    --text-primary: #F3F4F6;
+    --text-secondary: #A1A7B3;
+}
 
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-canvas: var(--bg-primary);
+    --color-surface: var(--bg-surface);
+    --color-surface-alt: var(--bg-surface-alt);
+    --color-line: var(--border-subtle);
+    --color-brand: var(--accent-unmsm);
+    --color-brand-hover: var(--accent-unmsm-hover);
+    --color-metallic: var(--accent-metallic);
+    --color-ink: var(--text-primary);
+    --color-muted: var(--text-secondary);
+}
+
+html,
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+::selection {
+    background: var(--accent-unmsm);
+    color: var(--text-primary);
+}
+
+:focus-visible {
+    outline: 2px solid var(--accent-metallic);
+    outline-offset: 2px;
+}
+
+/* Integración visual de Leaflet con la paleta de la aplicación. */
+.leaflet-container {
+    background: var(--bg-surface-alt);
+    font-family: inherit;
+}
+
+.leaflet-control-attribution {
+    background: rgb(20 23 28 / 90%) !important;
+    color: var(--text-secondary) !important;
+}
+
+.leaflet-control-attribution a {
+    color: var(--accent-metallic) !important;
+}
+
+.leaflet-bar {
+    border-color: var(--border-subtle) !important;
+}
+
+.leaflet-bar a {
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    border-bottom-color: var(--border-subtle);
+}
+
+.leaflet-bar a:hover {
+    background: var(--bg-surface-alt);
+    color: var(--accent-unmsm);
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+    background: var(--bg-surface);
+    color: var(--text-primary);
+}
+
+.leaflet-popup-content a {
+    color: var(--accent-metallic);
 }
