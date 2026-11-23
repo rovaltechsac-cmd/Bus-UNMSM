@@ -204,6 +204,56 @@ class PanelAdministradorTest extends TestCase
             ]);
     }
 
+    public function test_admin_activa_un_paradero_desde_la_tabla(): void
+    {
+        $paradero = Paradero::factory()->create(['activo' => false]);
+        $administrador = User::factory()->administrador()->create();
+
+        $this->actingAs($administrador)
+            ->patch(route('admin.paraderos.estado', $paradero), ['activo' => 1])
+            ->assertRedirect(route('admin.index'))
+            ->assertSessionHas('estado', 'Paradero activado correctamente.');
+
+        $this->assertTrue($paradero->fresh()->activo);
+    }
+
+    public function test_admin_desactiva_un_paradero_desde_la_tabla(): void
+    {
+        $paradero = Paradero::factory()->create(['activo' => true]);
+        $administrador = User::factory()->administrador()->create();
+
+        $this->actingAs($administrador)
+            ->patch(route('admin.paraderos.estado', $paradero), ['activo' => 0])
+            ->assertRedirect(route('admin.index'))
+            ->assertSessionHas('estado', 'Paradero desactivado correctamente.');
+
+        $this->assertFalse($paradero->fresh()->activo);
+    }
+
+    public function test_el_estado_del_paradero_requiere_un_valor_valido(): void
+    {
+        $paradero = Paradero::factory()->create(['activo' => true]);
+        $administrador = User::factory()->administrador()->create();
+
+        $this->actingAs($administrador)
+            ->patch(route('admin.paraderos.estado', $paradero), [])
+            ->assertSessionHasErrors('activo');
+
+        $this->assertTrue($paradero->fresh()->activo);
+    }
+
+    public function test_pasajero_no_puede_cambiar_el_estado_de_un_paradero(): void
+    {
+        $paradero = Paradero::factory()->create(['activo' => true]);
+        $pasajero = User::factory()->create();
+
+        $this->actingAs($pasajero)
+            ->patch(route('admin.paraderos.estado', $paradero), ['activo' => 0])
+            ->assertForbidden();
+
+        $this->assertTrue($paradero->fresh()->activo);
+    }
+
     public function test_admin_elimina_un_paradero(): void
     {
         $paradero = Paradero::factory()->create(['nombre' => 'Paradero a eliminar']);

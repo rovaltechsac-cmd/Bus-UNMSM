@@ -54,6 +54,8 @@ body {
 .leaflet-container {
     background: var(--bg-surface-alt);
     font-family: inherit;
+    /* Leaflet uses z-index values up to 800; isolate them so the sidebar stays on top. */
+    isolation: isolate;
 }
 
 .leaflet-control-attribution {

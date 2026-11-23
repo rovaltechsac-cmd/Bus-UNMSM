@@ -67,6 +67,10 @@ Route::middleware('auth')->group(function (): void {
         ->middleware('role:admin')
         ->name('admin.paraderos.update');
 
+    Route::patch('/admin/paraderos/{paradero}/estado', [AdminController::class, 'updateEstadoParadero'])
+        ->middleware('role:admin')
+        ->name('admin.paraderos.estado');
+
     Route::delete('/admin/paraderos/{paradero}', [AdminController::class, 'destroyParadero'])
         ->middleware('role:admin')
         ->name('admin.paraderos.destroy');

@@ -53,6 +53,20 @@ class AdminController extends Controller
             ->with('estado', 'Paradero actualizado correctamente.');
     }
 
+    public function updateEstadoParadero(Request $request, Paradero $paradero): RedirectResponse
+    {
+        $request->validate([
+            'activo' => ['required', 'boolean'],
+        ]);
+
+        $activo = $request->boolean('activo');
+
+        $paradero->update(['activo' => $activo]);
+
+        return to_route('admin.index')
+            ->with('estado', $activo ? 'Paradero activado correctamente.' : 'Paradero desactivado correctamente.');
+    }
+
     public function destroyParadero(Paradero $paradero): RedirectResponse
     {
         $paradero->delete();

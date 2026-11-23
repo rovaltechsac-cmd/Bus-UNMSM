@@ -56,9 +56,25 @@
                                     {{ number_format((float) $paradero->longitud, 7, '.', '') }}
                                 </td>
                                 <td class="px-4 py-3">
-                                    <span class="shrink-0 rounded-full border px-2 py-1 text-[11px] font-bold {{ $paradero->activo ? 'border-brand/30 bg-brand/10 text-brand' : 'border-line bg-surface text-muted' }}">
-                                        {{ $paradero->activo ? 'Activo' : 'Inactivo' }}
-                                    </span>
+                                    <form method="POST" action="{{ route('admin.paraderos.estado', $paradero) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="activo" value="0">
+                                        <div class="flex items-center gap-2">
+                                            <label class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center">
+                                                <input type="checkbox" name="activo" value="1" role="switch"
+                                                       @checked($paradero->activo)
+                                                       onchange="this.form.submit()"
+                                                       aria-label="Activar o desactivar {{ $paradero->nombre }}"
+                                                       class="peer sr-only">
+                                                <span class="absolute inset-0 rounded-full border border-line bg-surface-alt transition peer-checked:border-brand peer-checked:bg-brand peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-metallic"></span>
+                                                <span class="absolute left-0.5 top-0.5 size-5 rounded-full bg-metallic shadow transition peer-checked:translate-x-5 peer-checked:bg-white"></span>
+                                            </label>
+                                            <span class="text-xs font-bold {{ $paradero->activo ? 'text-brand' : 'text-muted' }}">
+                                                {{ $paradero->activo ? 'Activo' : 'Inactivo' }}
+                                            </span>
+                                        </div>
+                                    </form>
                                 </td>
                                 <td class="px-4 py-3">
                                     <div class="flex justify-end gap-2">
