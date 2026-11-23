@@ -1,0 +1,87 @@
+{
+  "_audio-z5B00QFL.js": {
+    "file": "assets/audio-z5B00QFL.js",
+    "name": "audio"
+  },
+  "_fonts-C9MNnjVw.css": {
+    "file": "assets/fonts-C9MNnjVw.css",
+    "src": "_fonts-C9MNnjVw.css"
+  },
+  "_instrument-sans-400-normal-D1W7dsQl.woff": {
+    "file": "assets/instrument-sans-400-normal-D1W7dsQl.woff",
+    "src": "_instrument-sans-400-normal-D1W7dsQl.woff"
+  },
+  "_instrument-sans-400-normal-DRC__1Mx.woff2": {
+    "file": "assets/instrument-sans-400-normal-DRC__1Mx.woff2",
+    "src": "_instrument-sans-400-normal-DRC__1Mx.woff2"
+  },
+  "_instrument-sans-500-normal-Dk9ku72i.woff2": {
+    "file": "assets/instrument-sans-500-normal-Dk9ku72i.woff2",
+    "src": "_instrument-sans-500-normal-Dk9ku72i.woff2"
+  },
+  "_instrument-sans-500-normal-Z6ESRlEs.woff": {
+    "file": "assets/instrument-sans-500-normal-Z6ESRlEs.woff",
+    "src": "_instrument-sans-500-normal-Z6ESRlEs.woff"
+  },
+  "_instrument-sans-600-normal-B7fBEWYG.woff2": {
+    "file": "assets/instrument-sans-600-normal-B7fBEWYG.woff2",
+    "src": "_instrument-sans-600-normal-B7fBEWYG.woff2"
+  },
+  "_instrument-sans-600-normal-B9e8oLYv.woff": {
+    "file": "assets/instrument-sans-600-normal-B9e8oLYv.woff",
+    "src": "_instrument-sans-600-normal-B9e8oLYv.woff"
+  },
+  "_mapa-BrVIsDG2.js": {
+    "file": "assets/mapa-BrVIsDG2.js",
+    "name": "mapa"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app--FBpP47D.css",
+    "name": "app",
+    "names": [
+      "app.css"
+    ],
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/admin.js": {
+    "file": "assets/admin-Yf_k1n1T.js",
+    "name": "admin",
+    "src": "resources/js/admin.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_mapa-BrVIsDG2.js"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-Bo_zZ5pq.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "resources/js/admin.js",
+      "resources/js/conductor.js",
+      "resources/js/pasajero.js"
+    ]
+  },
+  "resources/js/conductor.js": {
+    "file": "assets/conductor-Bj-3GUIf.js",
+    "name": "conductor",
+    "src": "resources/js/conductor.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_audio-z5B00QFL.js",
+      "_mapa-BrVIsDG2.js"
+    ]
+  },
+  "resources/js/pasajero.js": {
+    "file": "assets/pasajero-Bq6J41a5.js",
+    "name": "pasajero",
+    "src": "resources/js/pasajero.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_audio-z5B00QFL.js",
+      "_mapa-BrVIsDG2.js"
+    ]
+  }
+}
