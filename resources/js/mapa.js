@@ -5,6 +5,8 @@ function contenidoParadero(nombre) {
     return contenido;
 }
 
+const CENTRO_UNMSM = { lat: -12.0583, lng: -77.0833 };
+
 function iconoParadero(activo) {
     const L = window.L;
     const color = activo ? '#22C55E' : '#EF4444';
@@ -21,17 +23,6 @@ function iconoParadero(activo) {
     });
 }
 
-function centroDe(paraderos) {
-    if (paraderos.length === 0) {
-        return { lat: -12.0583, lng: -77.0833 };
-    }
-
-    return {
-        lat: paraderos.reduce((suma, paradero) => suma + Number(paradero.latitud), 0) / paraderos.length,
-        lng: paraderos.reduce((suma, paradero) => suma + Number(paradero.longitud), 0) / paraderos.length,
-    };
-}
-
 function crearMapaBase(paraderos, { alSeleccionarParadero } = {}) {
     const L = window.L;
     const elemento = document.getElementById('mapa');
@@ -40,8 +31,7 @@ function crearMapaBase(paraderos, { alSeleccionarParadero } = {}) {
         return null;
     }
 
-    const centro = centroDe(paraderos);
-    const mapa = L.map(elemento).setView([centro.lat, centro.lng], 16);
+    const mapa = L.map(elemento).setView([CENTRO_UNMSM.lat, CENTRO_UNMSM.lng], 16);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -116,14 +106,13 @@ export function crearMapaCampus(paraderos, { alSeleccionarParadero } = {}) {
         return null;
     }
 
-    const centro = centroDe(paraderos);
     const iconoBus = L.divIcon({
         className: 'bus-marker',
         html: '<div style="display:grid;place-items:center;width:100%;height:100%;color:#B91C1C;font-size:20px;line-height:1;text-shadow:0 0 2px #0B0C0E;">▲</div>',
         iconSize: [28, 28],
         iconAnchor: [14, 14],
     });
-    const marcadorBus = L.marker([centro.lat, centro.lng], {
+    const marcadorBus = L.marker([CENTRO_UNMSM.lat, CENTRO_UNMSM.lng], {
         icon: iconoBus,
         title: 'Bus del campus',
     });
