@@ -5,6 +5,22 @@ function contenidoParadero(nombre) {
     return contenido;
 }
 
+function iconoParadero(activo) {
+    const L = window.L;
+    const color = activo ? '#22C55E' : '#EF4444';
+
+    return L.divIcon({
+        className: 'pin-paradero',
+        html: `<svg viewBox="0 0 32 42" width="32" height="42" aria-hidden="true">
+            <path d="M16 2C8.3 2 2 8.3 2 16c0 10.5 14 24 14 24s14-13.5 14-24C30 8.3 23.7 2 16 2Z" fill="${color}" stroke="#0B0C0E" stroke-width="2" stroke-linejoin="round"></path>
+            <circle cx="16" cy="16" r="5.5" fill="#FFFFFF"></circle>
+        </svg>`,
+        iconSize: [32, 42],
+        iconAnchor: [16, 42],
+        popupAnchor: [0, -40],
+    });
+}
+
 function centroDe(paraderos) {
     if (paraderos.length === 0) {
         return { lat: -12.0583, lng: -77.0833 };
@@ -35,12 +51,9 @@ function crearMapaBase(paraderos, { alSeleccionarParadero } = {}) {
     paraderos.forEach((paradero) => {
         const latitud = Number(paradero.latitud);
         const longitud = Number(paradero.longitud);
-        const marcador = L.circleMarker([latitud, longitud], {
-            radius: 9,
-            color: '#F3F4F6',
-            weight: 2,
-            fillColor: '#B91C1C',
-            fillOpacity: 1,
+        const marcador = L.marker([latitud, longitud], {
+            icon: iconoParadero(paradero.activo !== false),
+            title: paradero.nombre,
         }).addTo(mapa);
 
         marcador.bindPopup(contenidoParadero(paradero.nombre));

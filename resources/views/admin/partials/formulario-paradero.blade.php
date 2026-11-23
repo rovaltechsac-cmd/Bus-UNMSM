@@ -88,8 +88,14 @@
 
 <section aria-labelledby="titulo-mapa-admin" class="mb-4 overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
     <div class="border-b border-line px-4 py-3">
-        <h2 id="titulo-mapa-admin" class="font-bold text-ink">Ubicación en el mapa</h2>
-        <p class="text-xs text-muted">Los círculos son los paraderos actuales; el marcador es el punto que se guardará.</p>
+        <div class="flex flex-wrap items-center justify-between gap-2">
+            <h2 id="titulo-mapa-admin" class="font-bold text-ink">Ubicación en el mapa</h2>
+            <div class="flex items-center gap-3 text-xs font-semibold text-muted">
+                <span class="inline-flex items-center gap-1"><span class="size-2 rounded-full" style="background: #22C55E;"></span> Activo</span>
+                <span class="inline-flex items-center gap-1"><span class="size-2 rounded-full" style="background: #EF4444;"></span> Inactivo</span>
+            </div>
+        </div>
+        <p class="mt-1 text-xs text-muted">El marcador es el punto que se guardará.</p>
     </div>
     <div id="mapa" class="h-[280px] w-full bg-surface-alt sm:h-[420px]" role="img" aria-label="Mapa para elegir la ubicación del paradero"></div>
 </section>
@@ -102,6 +108,7 @@
                 'nombre' => $paraderoItem->nombre,
                 'latitud' => (float) $paraderoItem->latitud,
                 'longitud' => (float) $paraderoItem->longitud,
+                'activo' => (bool) $paraderoItem->activo,
             ]),
             'marcadorTitulo' => $esEdicion ? 'Ubicación del paradero' : 'Ubicación del nuevo paradero',
         ]) }};

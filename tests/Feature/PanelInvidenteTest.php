@@ -59,6 +59,19 @@ class PanelInvidenteTest extends TestCase
             ->assertDontSee('Modo accesible</h2>', false);
     }
 
+    public function test_pasajero_ve_solo_paraderos_activos_en_mi_bus(): void
+    {
+        $paradero = Paradero::factory()->create(['nombre' => 'Puerta Principal']);
+        Paradero::factory()->create(['nombre' => 'Paradero Cerrado', 'activo' => false]);
+
+        $this->actingAs(User::factory()->create())
+            ->get(route('pasajero.index'))
+            ->assertOk()
+            ->assertSee('Mapa del campus')
+            ->assertSee($paradero->nombre)
+            ->assertDontSee('Paradero Cerrado');
+    }
+
     public function test_conductor_ve_el_mapa_con_los_paraderos_activos(): void
     {
         $paradero = Paradero::factory()->create(['nombre' => 'Puerta Principal']);

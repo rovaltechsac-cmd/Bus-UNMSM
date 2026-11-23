@@ -58,6 +58,10 @@ body {
     isolation: isolate;
 }
 
+.pin-paradero {
+    filter: drop-shadow(0 3px 2px rgb(0 0 0 / 55%));
+}
+
 .leaflet-control-attribution {
     background: rgb(20 23 28 / 90%) !important;
     color: var(--text-secondary) !important;
