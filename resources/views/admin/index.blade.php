@@ -5,22 +5,14 @@
 @section('contenido')
     <div class="mb-4">
         <p class="text-xs font-extrabold uppercase tracking-wider text-brand">Administración</p>
-        <h1 class="mt-1 text-2xl font-extrabold text-ink sm:text-3xl">Agregar paraderos</h1>
-        <p class="mt-1 text-sm text-muted">Toca el mapa o usa tu ubicación para marcar el punto exacto. Luego guarda.</p>
+        <h1 class="mt-1 text-2xl font-extrabold text-ink sm:text-3xl">Configuración de paraderos</h1>
+        <p class="mt-1 text-sm text-muted">Gestiona los puntos del campus desde el mapa. Usa «Agregar paradero» para registrar uno nuevo.</p>
     </div>
-
-    @if ($errors->any())
-        <div class="mb-4 rounded-xl border border-brand/40 bg-brand/10 p-3 text-sm text-ink" role="alert">
-            <ul class="list-inside list-disc gap-1">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
 
     @include('admin.partials.formulario-paradero', [
         'paraderos' => $paraderos,
+        'modal' => true,
+        'textoUbicacion' => 'Usa tu ubicación actual o escribe las coordenadas. También puedes cerrar el modal y tocar el mapa.',
     ])
 
     <section id="listado" aria-labelledby="titulo-listado" class="scroll-mt-24 rounded-2xl border border-line bg-surface p-4 shadow-sm sm:p-5">
@@ -105,3 +97,42 @@
         @endif
     </section>
 @endsection
+
+@push('scripts')
+    <script>
+        (() => {
+            const boton = document.getElementById('btn-agregar-paradero');
+            const modal = document.getElementById('modal-agregar-paradero');
+
+            if (!boton || !modal) {
+                return;
+            }
+
+            const alternar = (abierto) => {
+                modal.classList.toggle('hidden', !abierto);
+                modal.setAttribute('aria-hidden', abierto ? 'false' : 'true');
+                document.body.classList.toggle('overflow-hidden', abierto);
+
+                if (abierto) {
+                    modal.querySelector('#nombre')?.focus();
+                } else {
+                    boton.focus();
+                }
+            };
+
+            boton.addEventListener('click', () => alternar(true));
+            modal.querySelectorAll('[data-cerrar-modal]').forEach((elemento) => {
+                elemento.addEventListener('click', () => alternar(false));
+            });
+            document.addEventListener('keydown', (evento) => {
+                if (evento.key === 'Escape' && !modal.classList.contains('hidden')) {
+                    alternar(false);
+                }
+            });
+
+            if (modal.dataset.tieneErrores === '1') {
+                alternar(true);
+            }
+        })();
+    </script>
+@endpush

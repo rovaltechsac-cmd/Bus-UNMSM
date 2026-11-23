@@ -30,6 +30,19 @@ class PanelAdministradorTest extends TestCase
             ->assertSee('-77.0840000');
     }
 
+    public function test_el_formulario_de_alta_se_abre_desde_un_boton_del_mapa(): void
+    {
+        $administrador = User::factory()->administrador()->create();
+
+        $this->actingAs($administrador)
+            ->get(route('admin.index'))
+            ->assertOk()
+            ->assertSee('id="modal-agregar-paradero"', false)
+            ->assertSee('id="btn-agregar-paradero"', false)
+            ->assertSee('Agregar paradero')
+            ->assertSee('Usar mi ubicación actual');
+    }
+
     public function test_visitante_es_redirigido_al_login(): void
     {
         $this->get(route('admin.index'))
