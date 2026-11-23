@@ -22,8 +22,6 @@
 
         @if (auth()->user()?->esAdministrador())
             <x-nav-link ruta="{{ route('admin.index') }}" etiqueta="Configuración" icono="paraderos" :activo="request()->routeIs('admin.*')" />
-            <x-nav-link ruta="{{ route('admin.index') }}#listado" etiqueta="Paraderos" icono="bus" />
-            <x-nav-link ruta="{{ route('pasajero.index') }}" etiqueta="Vista del pasajero" icono="bus" />
         @endif
 
         @if (auth()->user()?->esConductor())
