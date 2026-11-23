@@ -20,7 +20,6 @@ class AdminController extends Controller
         return view('admin.index', [
             'pagina' => 'admin',
             'paraderos' => $paraderos,
-            'googleMapsKey' => config('services.google_maps.api_key'),
         ]);
     }
 

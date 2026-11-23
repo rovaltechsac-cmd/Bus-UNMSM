@@ -5,160 +5,125 @@ function contenidoParadero(nombre) {
     return contenido;
 }
 
-export function crearMapaAdmin(paraderos, { alElegir } = {}) {
+function centroDe(paraderos) {
+    if (paraderos.length === 0) {
+        return { lat: -12.0583, lng: -77.0833 };
+    }
+
+    return {
+        lat: paraderos.reduce((suma, paradero) => suma + Number(paradero.latitud), 0) / paraderos.length,
+        lng: paraderos.reduce((suma, paradero) => suma + Number(paradero.longitud), 0) / paraderos.length,
+    };
+}
+
+function crearMapaBase(paraderos, { alSeleccionarParadero } = {}) {
+    const L = window.L;
     const elemento = document.getElementById('mapa');
 
-    if (!elemento || !window.google?.maps) {
+    if (!elemento || !L) {
         return null;
     }
 
-    const centro = paraderos.length > 0
-        ? {
-            lat: paraderos.reduce((suma, paradero) => suma + Number(paradero.latitud), 0) / paraderos.length,
-            lng: paraderos.reduce((suma, paradero) => suma + Number(paradero.longitud), 0) / paraderos.length,
-        }
-        : { lat: -12.0583, lng: -77.0833 };
+    const centro = centroDe(paraderos);
+    const mapa = L.map(elemento).setView([centro.lat, centro.lng], 16);
 
-    const mapa = new google.maps.Map(elemento, {
-        center: centro,
-        zoom: 16,
-        mapTypeControl: false,
-        streetViewControl: false,
-    });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+    }).addTo(mapa);
 
     paraderos.forEach((paradero) => {
-        const marcador = new google.maps.Marker({
-            position: { lat: Number(paradero.latitud), lng: Number(paradero.longitud) },
-            map: mapa,
-            title: paradero.nombre,
-            icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 11,
-                fillColor: '#8c1d40',
-                fillOpacity: 1,
-                strokeColor: '#ffffff',
-                strokeWeight: 2,
-            },
-        });
-
-        const informacion = new google.maps.InfoWindow({
-            content: contenidoParadero(`${paradero.nombre} · ${paradero.latitud}, ${paradero.longitud}`),
-        });
-
-        marcador.addListener('click', () => informacion.open(mapa, marcador));
-    });
-
-    const marcadorNuevo = new google.maps.Marker({
-        map: mapa,
-        title: 'Ubicación del nuevo paradero',
-        draggable: true,
-        visible: false,
-        icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 13,
-            fillColor: '#0f766e',
+        const latitud = Number(paradero.latitud);
+        const longitud = Number(paradero.longitud);
+        const marcador = L.circleMarker([latitud, longitud], {
+            radius: 9,
+            color: '#ffffff',
+            weight: 2,
+            fillColor: '#8c1d40',
             fillOpacity: 1,
-            strokeColor: '#ffffff',
-            strokeWeight: 3,
-        },
+        }).addTo(mapa);
+
+        marcador.bindPopup(contenidoParadero(paradero.nombre));
+        marcador.on('click', () => alSeleccionarParadero?.(paradero));
     });
+
+    return mapa;
+}
+
+export function crearMapaAdmin(paraderos, { alElegir } = {}) {
+    const L = window.L;
+    const mapa = crearMapaBase(paraderos);
+
+    if (!mapa) {
+        return null;
+    }
+
+    let marcadorNuevo = null;
+
+    function configurarMarcadorNuevo() {
+        marcadorNuevo.on('dragend', () => {
+            const posicion = marcadorNuevo.getLatLng();
+            alElegir?.(posicion.lat, posicion.lng);
+        });
+    }
 
     function elegir(latitud, longitud) {
-        marcadorNuevo.setPosition({ lat: latitud, lng: longitud });
-        marcadorNuevo.setVisible(true);
+        const posicion = [Number(latitud), Number(longitud)];
+
+        if (!marcadorNuevo) {
+            marcadorNuevo = L.marker(posicion, {
+                title: 'Ubicación del nuevo paradero',
+                draggable: true,
+            }).addTo(mapa);
+            configurarMarcadorNuevo();
+        } else {
+            marcadorNuevo.setLatLng(posicion).addTo(mapa);
+        }
+
         alElegir?.(latitud, longitud);
     }
 
-    mapa.addListener('click', (evento) => {
-        elegir(evento.latLng.lat(), evento.latLng.lng());
-    });
-
-    marcadorNuevo.addListener('dragend', () => {
-        const posicion = marcadorNuevo.getPosition();
-
-        if (posicion) {
-            alElegir?.(posicion.lat(), posicion.lng());
-        }
+    mapa.on('click', (evento) => {
+        elegir(evento.latlng.lat, evento.latlng.lng);
     });
 
     return {
         ubicar(latitud, longitud) {
             elegir(latitud, longitud);
-            mapa.panTo({ lat: latitud, lng: longitud });
+            mapa.panTo([Number(latitud), Number(longitud)]);
         },
     };
 }
 
 export function crearMapaCampus(paraderos, { alSeleccionarParadero } = {}) {
-    const elemento = document.getElementById('mapa');
+    const L = window.L;
+    const mapa = crearMapaBase(paraderos, { alSeleccionarParadero });
 
-    if (!elemento || !window.google?.maps) {
+    if (!mapa) {
         return null;
     }
 
-    const centro = paraderos.length > 0
-        ? {
-            lat: paraderos.reduce((suma, paradero) => suma + paradero.latitud, 0) / paraderos.length,
-            lng: paraderos.reduce((suma, paradero) => suma + paradero.longitud, 0) / paraderos.length,
-        }
-        : { lat: -12.0583, lng: -77.0833 };
-
-    const mapa = new google.maps.Map(elemento, {
-        center: centro,
-        zoom: 16,
-        mapTypeControl: false,
-        streetViewControl: false,
+    const centro = centroDe(paraderos);
+    const iconoBus = L.divIcon({
+        className: 'bus-marker',
+        html: '<div style="display:grid;place-items:center;width:100%;height:100%;color:#0f766e;font-size:20px;line-height:1;text-shadow:0 0 2px #fff;">▲</div>',
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
     });
-
-    paraderos.forEach((paradero) => {
-        const marcador = new google.maps.Marker({
-            position: { lat: paradero.latitud, lng: paradero.longitud },
-            map: mapa,
-            title: paradero.nombre,
-            icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 11,
-                fillColor: '#8c1d40',
-                fillOpacity: 1,
-                strokeColor: '#ffffff',
-                strokeWeight: 2,
-            },
-        });
-
-        const informacion = new google.maps.InfoWindow({
-            content: contenidoParadero(paradero.nombre),
-        });
-
-        marcador.addListener('click', () => {
-            informacion.open(mapa, marcador);
-            alSeleccionarParadero?.(paradero);
-        });
-    });
-
-    const marcadorBus = new google.maps.Marker({
-        map: mapa,
+    const marcadorBus = L.marker([centro.lat, centro.lng], {
+        icon: iconoBus,
         title: 'Bus del campus',
-        visible: false,
-        icon: {
-            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-            scale: 7,
-            fillColor: '#0f766e',
-            fillOpacity: 1,
-            strokeColor: '#ffffff',
-            strokeWeight: 2,
-        },
     });
 
     return {
         actualizarBus(latitud, longitud) {
-            marcadorBus.setPosition({ lat: latitud, lng: longitud });
-            marcadorBus.setVisible(true);
+            marcadorBus.setLatLng([Number(latitud), Number(longitud)]).addTo(mapa);
         },
         centrar(latitud, longitud) {
-            mapa.panTo({ lat: latitud, lng: longitud });
+            mapa.panTo([Number(latitud), Number(longitud)]);
         },
         ocultarBus() {
-            marcadorBus.setVisible(false);
+            marcadorBus.remove();
         },
     };
 }

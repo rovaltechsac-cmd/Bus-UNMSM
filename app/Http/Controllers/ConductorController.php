@@ -17,7 +17,6 @@ class ConductorController extends Controller
         return view('conductor.index', [
             'pagina' => 'conductor',
             'paraderos' => $paraderos,
-            'googleMapsKey' => config('services.google_maps.api_key'),
             'radioParadero' => config('campus.radio_paradero_m'),
         ]);
     }

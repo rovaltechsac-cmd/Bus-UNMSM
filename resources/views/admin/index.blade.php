@@ -90,7 +90,6 @@
             <p class="text-xs text-slate-500">Los círculos son los paraderos actuales; el verde es el nuevo paradero.</p>
         </div>
         <div id="mapa" class="h-[280px] w-full bg-slate-200 sm:h-[420px]" role="img" aria-label="Mapa para elegir la ubicación del paradero"></div>
-        @include('partials.mapa-aviso')
     </section>
 
     <section aria-labelledby="titulo-listado" class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">

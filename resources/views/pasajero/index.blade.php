@@ -47,7 +47,6 @@
             </span>
         </div>
         <div id="mapa" class="h-[280px] w-full bg-slate-200 sm:h-[420px]" role="img" aria-label="Mapa con los paraderos y la ubicación del bus"></div>
-        @include('partials.mapa-aviso')
     </section>
 @endsection
 

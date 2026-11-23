@@ -17,7 +17,6 @@ class PasajeroController extends Controller
         return view('pasajero.index', [
             'pagina' => 'pasajero',
             'paraderos' => $paraderos,
-            'googleMapsKey' => config('services.google_maps.api_key'),
             'radioParadero' => config('campus.radio_paradero_m'),
             'esInvidenteInicial' => false,
         ]);
