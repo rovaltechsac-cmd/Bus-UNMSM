@@ -66,7 +66,7 @@
         <div class="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
             <h2 id="titulo-mapa-conductor" class="font-bold text-ink">Mapa del recorrido</h2>
             <span class="flex items-center gap-2 text-xs text-muted">
-                <span class="size-2 rounded-full bg-brand"></span> Automático
+                <span class="size-2 rounded-full bg-blue-500"></span> Tu bus en vivo
             </span>
         </div>
         <div id="mapa" class="h-[280px] w-full bg-surface-alt sm:h-[420px]" role="img" aria-label="Mapa con los paraderos y la ubicación del bus"></div>
@@ -85,6 +85,7 @@
                 'longitud' => (float) $paradero->longitud,
             ]),
             'endpoints' => [
+                'bus' => route('api.bus.show'),
                 'ubicacion' => route('api.conductor.ubicacion.store'),
                 'alertas' => route('api.conductor.alertas.index'),
                 'atender' => route('api.conductor.alertas.atender', ['alerta' => '__ID__']),

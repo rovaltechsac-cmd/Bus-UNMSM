@@ -164,7 +164,10 @@ async function actualizarEstado() {
 
         if (controlMapa) {
             if (datos.bus) {
-                controlMapa.actualizarBus(datos.bus.latitud, datos.bus.longitud);
+                controlMapa.actualizarBus(datos.bus.latitud, datos.bus.longitud, {
+                    rumbo: datos.bus.rumbo,
+                    rastro: datos.bus.rastro ?? [],
+                });
             } else {
                 controlMapa.ocultarBus();
             }

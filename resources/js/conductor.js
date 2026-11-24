@@ -31,6 +31,26 @@ function endpointConId(plantilla, id) {
 
 function inicializarMapa() {
     controlMapa = crearMapaCampus(paraderos);
+    cargarBus();
+}
+
+async function cargarBus() {
+    if (!controlMapa) {
+        return;
+    }
+
+    try {
+        const datos = await peticion(configuracion.endpoints.bus);
+
+        if (datos.activo && datos.bus) {
+            controlMapa.actualizarBus(datos.bus.latitud, datos.bus.longitud, {
+                rumbo: datos.bus.rumbo,
+                rastro: datos.bus.rastro ?? [],
+            });
+        }
+    } catch (error) {
+        console.warn('No se pudo cargar el estado del bus', error);
+    }
 }
 
 window.__mapaIniciar = inicializarMapa;
@@ -90,7 +110,9 @@ function iniciarGeolocalizacion() {
             detalleGps.textContent = `Lat ${latitude.toFixed(6)} · Lon ${longitude.toFixed(6)} · ±${Math.round(accuracy)} m`;
 
             if (controlMapa) {
-                controlMapa.actualizarBus(latitude, longitude);
+                controlMapa.actualizarBus(latitude, longitude, {
+                    rumbo: heading === null ? null : heading,
+                });
                 controlMapa.centrar(latitude, longitude);
             }
 
@@ -100,7 +122,7 @@ function iniciarGeolocalizacion() {
             ultimoEnvio = ahora;
 
             try {
-                await peticion(configuracion.endpoints.ubicacion, {
+                const datos = await peticion(configuracion.endpoints.ubicacion, {
                     method: 'POST',
                     body: JSON.stringify({
                         latitud: latitude,
@@ -108,6 +130,11 @@ function iniciarGeolocalizacion() {
                         rumbo: heading === null ? null : Number(heading.toFixed(2)),
                         exactitud_m: Math.round(accuracy),
                     }),
+                });
+
+                controlMapa?.actualizarBus(latitude, longitude, {
+                    rumbo: heading === null ? null : heading,
+                    rastro: datos.rastro ?? [],
                 });
                 detalleGps.textContent += ' · Enviada al servidor';
             } catch (error) {
@@ -249,3 +276,4 @@ if ('serviceWorker' in navigator) {
 iniciarGeolocalizacion();
 cargarAlertas();
 setInterval(cargarAlertas, 4000);
+setInterval(cargarBus, 5000);

@@ -38,6 +38,36 @@ function inicializarMapa() {
     });
 
     sincronizarInputs();
+    cargarBus();
+}
+
+async function cargarBus() {
+    if (!controlMapa || !configuracion.endpoints?.bus) {
+        return;
+    }
+
+    try {
+        const respuesta = await fetch(configuracion.endpoints.bus, {
+            headers: { Accept: 'application/json' },
+        });
+
+        if (!respuesta.ok) {
+            return;
+        }
+
+        const datos = await respuesta.json();
+
+        if (datos.activo && datos.bus) {
+            controlMapa.actualizarBus(datos.bus.latitud, datos.bus.longitud, {
+                rumbo: datos.bus.rumbo,
+                rastro: datos.bus.rastro ?? [],
+            });
+        } else {
+            controlMapa.ocultarBus();
+        }
+    } catch (error) {
+        console.warn('No se pudo cargar el bus en el mapa', error);
+    }
 }
 
 window.__mapaIniciar = inicializarMapa;
@@ -79,3 +109,4 @@ botonUbicacion?.addEventListener('click', () => {
 
 latitudInput?.addEventListener('change', sincronizarInputs);
 longitudInput?.addEventListener('change', sincronizarInputs);
+setInterval(cargarBus, 5000);

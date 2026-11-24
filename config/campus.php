@@ -18,6 +18,10 @@ return [
 
     'bus_inactivo_minutos' => (int) env('BUS_INACTIVO_MINUTOS', 2),
 
+    'rastro_puntos' => (int) env('BUS_RASTRO_PUNTOS', 60),
+
+    'rastro_minutos' => (int) env('BUS_RASTRO_MINUTOS', 10),
+
     'limites' => [
         'latitud_min' => (float) env('BUS_LATITUD_MIN', -12.20),
         'latitud_max' => (float) env('BUS_LATITUD_MAX', -11.90),

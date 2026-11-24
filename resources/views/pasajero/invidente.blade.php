@@ -47,8 +47,11 @@
     </section>
 
     <section aria-labelledby="titulo-mapa-invidente" class="overflow-hidden rounded-2xl border border-line bg-surface shadow-sm">
-        <div class="border-b border-line px-4 py-3">
+        <div class="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
             <h2 id="titulo-mapa-invidente" class="font-bold text-ink">Mapa del campus</h2>
+            <span class="flex items-center gap-2 text-xs text-muted">
+                <span class="size-2 rounded-full bg-blue-500"></span> Bus en vivo
+            </span>
         </div>
         <div id="mapa" class="h-[240px] w-full bg-surface-alt sm:h-[360px]" role="img" aria-label="Mapa con los paraderos y la ubicación del bus"></div>
     </section>

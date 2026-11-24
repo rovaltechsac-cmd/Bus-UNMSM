@@ -7,6 +7,7 @@ use App\Models\Paradero;
 use App\Models\UbicacionBus;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class UbicacionBusController extends Controller
 {
@@ -26,6 +27,9 @@ class UbicacionBusController extends Controller
             ->first();
 
         $activa = $ubicacion?->esReciente() ?? false;
+        $rastro = $activa && $ubicacion !== null
+            ? $this->puntosPublicos($this->rastroDe($ubicacion->conductor_id))
+            : [];
 
         $distancia = $ubicacion !== null && $paradero !== null
             ? $ubicacion->distanciaHasta($paradero)
@@ -43,6 +47,7 @@ class UbicacionBusController extends Controller
                 'rumbo' => $ubicacion->rumbo === null ? null : (float) $ubicacion->rumbo,
                 'conductor' => $ubicacion->conductor?->name,
                 'actualizado_at' => $ubicacion->registrado_at?->toIso8601String(),
+                'rastro' => $rastro,
             ],
             'eta' => $minutos === null || $distancia === null ? null : [
                 'minutos' => $minutos,
@@ -76,12 +81,75 @@ class UbicacionBusController extends Controller
             ],
         );
 
+        $rastro = $this->registrarPuntoRastro($request->user()->id, $ubicacion);
+
         return response()->json([
             'mensaje' => 'Ubicación registrada.',
             'latitud' => (float) $ubicacion->latitud,
             'longitud' => (float) $ubicacion->longitud,
             'registrado_at' => $ubicacion->registrado_at?->toIso8601String(),
+            'rastro' => $this->puntosPublicos($rastro),
         ], 201);
+    }
+
+    private function claveRastro(int $conductorId): string
+    {
+        return "bus:rastro:{$conductorId}";
+    }
+
+    /**
+     * @return array<int, array{latitud: float, longitud: float, registrado_at: string, marca_tiempo: int}>
+     */
+    private function rastroDe(int $conductorId): array
+    {
+        $rastro = Cache::get($this->claveRastro($conductorId), []);
+
+        return is_array($rastro) ? $rastro : [];
+    }
+
+    /**
+     * @param  array<int, array{latitud: float, longitud: float, registrado_at: string, marca_tiempo: int}>  $rastro
+     * @return array<int, array{latitud: float, longitud: float, registrado_at: string}>
+     */
+    private function puntosPublicos(array $rastro): array
+    {
+        return array_map(
+            fn (array $punto): array => [
+                'latitud' => $punto['latitud'],
+                'longitud' => $punto['longitud'],
+                'registrado_at' => $punto['registrado_at'],
+            ],
+            $rastro,
+        );
+    }
+
+    /**
+     * @return array<int, array{latitud: float, longitud: float, registrado_at: string, marca_tiempo: int}>
+     */
+    private function registrarPuntoRastro(int $conductorId, UbicacionBus $ubicacion): array
+    {
+        $puntos = $this->rastroDe($conductorId);
+        $puntos[] = [
+            'latitud' => (float) $ubicacion->latitud,
+            'longitud' => (float) $ubicacion->longitud,
+            'registrado_at' => $ubicacion->registrado_at->toIso8601String(),
+            'marca_tiempo' => $ubicacion->registrado_at->getTimestamp(),
+        ];
+
+        $desde = now()->subMinutes((int) config('campus.rastro_minutos'))->getTimestamp();
+        $puntos = array_values(array_filter(
+            $puntos,
+            fn (array $punto): bool => ($punto['marca_tiempo'] ?? 0) >= $desde,
+        ));
+        $puntos = array_slice($puntos, -max(1, (int) config('campus.rastro_puntos')));
+
+        Cache::put(
+            $this->claveRastro($conductorId),
+            $puntos,
+            now()->addMinutes((int) config('campus.rastro_minutos')),
+        );
+
+        return $puntos;
     }
 
     private function textoETA(int $minutos, float $distancia): string

@@ -141,6 +141,7 @@
             <div class="flex items-center gap-3 text-xs font-semibold text-muted">
                 <span class="inline-flex items-center gap-1"><span class="size-2 rounded-full" style="background: #22C55E;"></span> Activo</span>
                 <span class="inline-flex items-center gap-1"><span class="size-2 rounded-full" style="background: #EF4444;"></span> Inactivo</span>
+                <span class="inline-flex items-center gap-1"><span class="size-2 rounded-full" style="background: #3B82F6;"></span> Bus en vivo</span>
             </div>
         </div>
         @if ($modal)
@@ -170,6 +171,9 @@
                 'activo' => (bool) $paraderoItem->activo,
             ]),
             'marcadorTitulo' => $esEdicion ? 'Ubicación del paradero' : 'Ubicación del nuevo paradero',
+            'endpoints' => [
+                'bus' => route('api.bus.show'),
+            ],
         ]) }};
     </script>
     @include('partials.mapa-script')

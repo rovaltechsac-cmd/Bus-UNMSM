@@ -53,6 +53,60 @@ function crearMapaBase(paraderos, { alSeleccionarParadero } = {}) {
     return mapa;
 }
 
+function crearSeguimientoBus(mapa) {
+    const L = window.L;
+
+    const iconoBus = L.divIcon({
+        className: 'bus-marker',
+        html: `<div class="bus-icono" style="display:grid;place-items:center;width:100%;height:100%;transform-origin:center;">
+            <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
+                <circle cx="16" cy="16" r="15" fill="#0B0C0E" opacity="0.85"></circle>
+                <rect x="7" y="6" width="18" height="17" rx="4" fill="#3B82F6" stroke="#F3F4F6" stroke-width="1.5"></rect>
+                <rect x="10" y="9" width="12" height="6" rx="1.5" fill="#BFDBFE"></rect>
+                <circle cx="12" cy="25" r="2.2" fill="#F3F4F6"></circle>
+                <circle cx="20" cy="25" r="2.2" fill="#F3F4F6"></circle>
+            </svg>
+        </div>`,
+        iconSize: [36, 36],
+        iconAnchor: [18, 18],
+        popupAnchor: [0, -18],
+    });
+
+    const marcadorBus = L.marker([CENTRO_UNMSM.lat, CENTRO_UNMSM.lng], {
+        icon: iconoBus,
+        title: 'Bus en vivo',
+    });
+    const lineaRastro = L.polyline([], {
+        color: '#3B82F6',
+        weight: 4,
+        opacity: 0.85,
+        lineCap: 'round',
+        lineJoin: 'round',
+    });
+
+    function aplicarRumbo(rumbo) {
+        const icono = marcadorBus.getElement()?.querySelector('.bus-icono');
+
+        if (icono) {
+            icono.style.transform = `rotate(${Number(rumbo) || 0}deg)`;
+        }
+    }
+
+    return {
+        actualizar(latitud, longitud, { rumbo = null, rastro = [] } = {}) {
+            marcadorBus.setLatLng([Number(latitud), Number(longitud)]).addTo(mapa);
+            requestAnimationFrame(() => aplicarRumbo(rumbo));
+            lineaRastro
+                .setLatLngs(rastro.map((punto) => [Number(punto.latitud), Number(punto.longitud)]))
+                .addTo(mapa);
+        },
+        ocultar() {
+            marcadorBus.remove();
+            lineaRastro.remove();
+        },
+    };
+}
+
 export function crearMapaAdmin(paraderos, { alElegir, tituloMarcador } = {}) {
     const L = window.L;
     const mapa = crearMapaBase(paraderos);
@@ -62,6 +116,7 @@ export function crearMapaAdmin(paraderos, { alElegir, tituloMarcador } = {}) {
     }
 
     let marcadorNuevo = null;
+    const seguimientoBus = crearSeguimientoBus(mapa);
 
     function configurarMarcadorNuevo() {
         marcadorNuevo.on('dragend', () => {
@@ -95,37 +150,33 @@ export function crearMapaAdmin(paraderos, { alElegir, tituloMarcador } = {}) {
             elegir(latitud, longitud);
             mapa.panTo([Number(latitud), Number(longitud)]);
         },
+        actualizarBus(latitud, longitud, opciones = {}) {
+            seguimientoBus.actualizar(latitud, longitud, opciones);
+        },
+        ocultarBus() {
+            seguimientoBus.ocultar();
+        },
     };
 }
 
 export function crearMapaCampus(paraderos, { alSeleccionarParadero } = {}) {
-    const L = window.L;
     const mapa = crearMapaBase(paraderos, { alSeleccionarParadero });
 
     if (!mapa) {
         return null;
     }
 
-    const iconoBus = L.divIcon({
-        className: 'bus-marker',
-        html: '<div style="display:grid;place-items:center;width:100%;height:100%;color:#B91C1C;font-size:20px;line-height:1;text-shadow:0 0 2px #0B0C0E;">▲</div>',
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
-    });
-    const marcadorBus = L.marker([CENTRO_UNMSM.lat, CENTRO_UNMSM.lng], {
-        icon: iconoBus,
-        title: 'Bus del campus',
-    });
+    const seguimientoBus = crearSeguimientoBus(mapa);
 
     return {
-        actualizarBus(latitud, longitud) {
-            marcadorBus.setLatLng([Number(latitud), Number(longitud)]).addTo(mapa);
+        actualizarBus(latitud, longitud, opciones = {}) {
+            seguimientoBus.actualizar(latitud, longitud, opciones);
         },
         centrar(latitud, longitud) {
             mapa.panTo([Number(latitud), Number(longitud)]);
         },
         ocultarBus() {
-            marcadorBus.remove();
+            seguimientoBus.ocultar();
         },
     };
 }
